@@ -6,92 +6,100 @@ const path = require("node:path");
 
 const session = require("express-session");
 const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
-const { PrismaClient } = require('@prisma/client');
-const pgSession = require("connect-pg-simple")(session);
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcryptjs");
 
 const assetsPath = path.join(__dirname, "public");
 
-// View engine
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
+(async () => {
+    const { prisma } = await import("./lib/prisma.mjs");
 
-// Body parsing + static assets
-app.use(express.urlencoded({ extended: false }));
-app.use(express.static(assetsPath));
+    // View engine
+    app.set("views", path.join(__dirname, "views"));
+    app.set("view engine", "ejs");
 
-// Sessions store using PrismaSessionStore
-app.use(
-    expressSession({
-        cookie: {
-            maxAge: 1000 * 60 * 60 * 24,
-        },
-        secret: process.env.SESSION_SECRET,
-        resave: false,
-        saveUninitialized: true,
-        store: new PrismaSessionStore(
-            new PrismaClient(),
-            {
+    // Body parsing + static assets
+    app.use(express.urlencoded({ extended: false }));
+    app.use(express.static(assetsPath));
+
+    // Sessions store using PrismaSessionStore
+    app.use(
+        session({
+            cookie: {
+                maxAge: 1000 * 60 * 60 * 24,
+            },
+            secret: process.env.SESSION_SECRET,
+            resave: false,
+            saveUninitialized: false,
+            store: new PrismaSessionStore(prisma, {
                 checkPeriod: 2 * 60 * 1000,
                 dbRecordIdIsSessionId: true,
-                dbRecordIdFunction: undefined,
+            })
+        })
+    );
+
+    // Passport init + session hookup
+    app.use(passport.initialize());
+    app.use(passport.session());
+
+    // Routers
+    const authRouter = require("./routers/authRouter.js");
+
+    // Passport Local Strategy (bcrypt)
+    passport.use(
+        new LocalStrategy({ usernameField: "username" }, async (username, password, done) => {
+            try {
+                const user = await prisma.user.findUnique({
+                    where: { username },
+                });
+
+                if (!user) return done(null, false, { message: "Incorrect username" });
+
+                const ok = await bcrypt.compare(password, user.hashedPassword);
+                if (!ok) return done(null, false, { message: "Incorrect password" });
+
+                return done(null, user);
+            } catch (err) {
+                return done(err);
             }
-        )
-    })
-);
+        })
+    );
 
-// Passport init + session hookup
-app.use(passport.initialize());
-app.use(passport.session());
+    passport.serializeUser((user, done) => {
+        done(null, user.id);
+    });
 
-// Routers
-
-// Passport Local Strategy (bcrypt)
-passport.use(
-    new LocalStrategy(async (username, password, done) => {
+    passport.deserializeUser(async (id, done) => {
         try {
-            const { rows } = await pool.query(
-                "SELECT * FROM users WHERE username = $1",
-                [username]
-            );
+            const user = await prisma.user.findUnique({
+                where: { id: Number(id) },
+            });
 
-            const user = rows[0];
-            if (!user) return done(null, false, { message: "Incorrect username" });
-
-            const ok = await bcrypt.compare(password, user.password_hash);
-            if (!ok) return done(null, false, { message: "Incorrect password" });
-
-            return done(null, user);
+            done(null, user || false);
         } catch (err) {
-            return done(err);
+            done(err);
         }
-    })
-);
+    });
 
-passport.deserializeUser(async (id, done) => {
-    try {
-        const { rows } = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
-        done(null, rows[0] || false);
-    } catch (err) {
-        done(err);
-    }
-});
+    // Add currentUser on all requests
+    app.use((req, res, next) => {
+        res.locals.currentUser = req.user;
+        next();
+    });
 
-app.use((req, res, next) => {
-    res.locals.currentUser = req.user;
-    next();
-});
+    // Add activePath on all requests
+    app.use((req, res, next) => {
+        res.locals.activePath = req.path;
+        next();
+    });
 
-app.use((req, res, next) => {
-    res.locals.activePath = req.path;
-    next();
-});
+    // Routes
+    app.use('/', authRouter);
 
-// Routes
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-    console.log(`Server started on port ${PORT}`);
-});
+    const PORT = process.env.PORT || 3001;
+    app.listen(PORT, () => {
+        console.log(`Server started on port ${PORT}`);
+    });
+})();
