@@ -1,0 +1,38 @@
+<head>
+    <title>
+        <%= title %>
+    </title>
+</head>
+
+<body>
+    <%- include("partials/header") %>
+        <main>
+            <form action="/register" method="POST">
+                <h1>Register Account</h1>
+
+                <% if (errors && errors.length> 0) { %>
+                    <ul class="auth-errors">
+                        <% errors.forEach(error=> { %>
+                            <li>
+                                <%= error.msg %>
+                            </li>
+                            <% }) %>
+                    </ul>
+                    <% } %>
+
+                        <label for="username">Username</label>
+                        <input type="text" name="username" id="username">
+
+                        <label for="email">Email</label>
+                        <input type="email" name="email" id="email">
+
+                        <label for="password">Password</label>
+                        <input type="password" name="password" id="password">
+
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" name="confirmPassword" id="confirmPassword">
+
+                        <button type="submit">Register</button>
+            </form>
+        </main>
+</body>
