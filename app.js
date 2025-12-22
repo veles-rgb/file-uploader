@@ -22,6 +22,8 @@ const assetsPath = path.join(__dirname, "public");
     // Body parsing + static assets
     app.use(express.urlencoded({ extended: false }));
     app.use(express.static(assetsPath));
+    // Make uploads public FOR NOW
+    app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
     // Sessions store using PrismaSessionStore
     app.use(
@@ -45,6 +47,7 @@ const assetsPath = path.join(__dirname, "public");
 
     // Routers
     const authRouter = require("./routers/authRouter.js");
+    const filesRouter = require("./routers/filesRouter.js");
 
     // Passport Local Strategy (bcrypt)
     passport.use(
@@ -96,6 +99,7 @@ const assetsPath = path.join(__dirname, "public");
 
     // Routes
     app.use('/', authRouter);
+    app.use('/files', filesRouter);
 
 
     const PORT = process.env.PORT || 3001;
