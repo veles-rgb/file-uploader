@@ -1,0 +1,51 @@
+<head>
+    <title>
+        <%= title %>
+    </title>
+</head>
+
+<body>
+    <%- include("partials/header") %>
+
+        <main>
+            <% if (result) { %>
+                <div>
+
+                    <% if (result.mimeType.startsWith("image/")) { %>
+                        <img src="<%= result.previewUrl %>" alt="<%= result.originalName %>" width="200">
+
+                        <% } else if (result.mimeType.startsWith("video/")) { %>
+                            <video controls width="300">
+                                <source src="<%= result.previewUrl %>" type="<%= result.mimeType %>">
+                                Your browser does not support video playback.
+                            </video>
+
+                            <% } else if (result.mimeType.startsWith("audio/")) { %>
+                                <audio controls>
+                                    <source src="<%= result.previewUrl %>" type="<%= result.mimeType %>">
+                                    Your browser does not support audio playback.
+                                </audio>
+
+                                <% } else if (result.mimeType==="application/pdf" ) { %>
+                                    <iframe src="<%= result.previewUrl %>" width="400" height="500"
+                                        style="border: none;">
+                                    </iframe>
+
+                                    <% } else { %>
+                                        <div>
+                                            <p>No preview available for this file type.</p>
+                                            <a href="<%= result.previewUrl %>" target="_blank">Open file</a>
+                                        </div>
+                                        <% } %>
+                                            <a href="<%= result.previewUrl %>" download>Download</a>
+                                            <div>
+                                                <strong>
+                                                    <%= result.originalName %>
+                                                </strong>
+                                            </div>
+                </div>
+                <% } else { %>
+                    <h1>File not found...</h1>
+                    <% } %>
+        </main>
+</body>

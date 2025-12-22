@@ -7,6 +7,10 @@
 <body>
     <%- include("partials/header") %>
         <main>
-            <h1>This is the index</h1>
+            <% if (!currentUser) { %>
+                <p>Please <a href="/login">login</a> to start using veles file!</p>
+                <% } else { %>
+                    <a href="/files">Open Files</a>
+                    <% } %>
         </main>
 </body>

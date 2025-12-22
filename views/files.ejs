@@ -1,0 +1,27 @@
+<head>
+    <title>
+        <%= title %>
+    </title>
+</head>
+
+<body>
+    <%- include("partials/header") %>
+        <main>
+            <h1>Your files:</h1>
+            <% if (results && results.length> 0) { %>
+                <div>
+                    <% results.forEach(result=> { %>
+                        <div style="border: 1px solid red;">
+                            <img src="<%= result.previewUrl %>" alt="" width="100px">
+                            <div>
+                                <%= result.originalName %>
+                            </div>
+                            <button onclick="window.location.href='/files/<%= result.id %>'">View File</button>
+                        </div>
+                        <% }) %>
+                </div>
+                <% } else { %>
+                    <p>No files found.</p>
+                    <% } %>
+        </main>
+</body>
