@@ -11,13 +11,54 @@ model Session {
   id        String   @id
   sid       String   @unique
   data      String   @db.Text
-  expiresAt   DateTime
+  expiresAt DateTime
 }
 
 model User {
-  id             Int     @id @default(autoincrement())
-  email          String  @unique @db.VarChar(254)
-  username       String  @unique @db.VarChar(20)
+  id             Int      @id @default(autoincrement())
+  email          String   @unique @db.VarChar(254)
+  username       String   @unique @db.VarChar(20)
   hashedPassword String
+  createdAt      DateTime @default(now())
+
+  folders Folder[]
+  files   File[]
+}
+
+model Folder {
+  id       Int    @id @default(autoincrement())
+  name     String @db.VarChar(120)
+  ownerId  Int
+  parentId Int?
+
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  parent   Folder?  @relation("FolderTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children Folder[] @relation("FolderTree")
+
+  files File[]
+
   createdAt DateTime @default(now())
+
+  @@unique([ownerId, parentId, name])
+  @@index([ownerId])
+  @@index([parentId])
+}
+
+model File {
+  id       Int  @id @default(autoincrement())
+  ownerId  Int
+  folderId Int?
+
+  originalName String   @db.VarChar(255)
+  storagePath  String   @db.Text
+  mimeType     String   @db.VarChar(120)
+  sizeBytes    Int
+  createdAt    DateTime @default(now())
+
+  owner  User    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  folder Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+
+  @@index([ownerId])
+  @@index([folderId])
 }
