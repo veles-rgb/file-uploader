@@ -1,13 +1,15 @@
-const { title } = require("node:process");
-
 async function renderFiles(req, res, next) {
     if (!req.user) return res.redirect('/login');
 
     try {
         const { prisma } = await import("../lib/prisma.mjs");
 
+        const foldersFromDb = await prisma.folder.findMany({
+            where: { ownerId: req.user.id, parentId: null }
+        });
+
         const filesFromDb = await prisma.file.findMany({
-            where: { ownerId: req.user.id }
+            where: { ownerId: req.user.id, folderId: null }
         });
 
         const path = require("node:path");
@@ -18,7 +20,9 @@ async function renderFiles(req, res, next) {
 
         res.render('files', {
             title: "File Viewer",
-            results
+            foldersFromDb,
+            results,
+            currentFolder: null
         });
     } catch (error) {
         return next(error);
@@ -31,12 +35,16 @@ async function renderFileById(req, res, next) {
     try {
         const { prisma } = await import("../lib/prisma.mjs");
 
-        const fileFromDb = await prisma.file.findFirst({
+        const fileFromDb = await prisma.file.findUnique({
             where: { id: Number(req.params.id) }
         });
 
         if (!fileFromDb) {
             return res.status(404).render("file", {
+                // THIS WONT WORK
+                // THIS WONT WORK
+                // THIS WONT WORK
+                // THIS WONT WORK
                 title: "File not found",
                 result: null
             });
@@ -61,8 +69,13 @@ async function renderFileById(req, res, next) {
 function renderUploadForm(req, res) {
     if (!req.user) return res.redirect('/login');
 
+    const folderId = req.query.folderId
+        ? Number(req.query.folderId)
+        : null;
+
     res.render('uploadForm', {
-        title: "Upload a file"
+        title: "Upload a file",
+        currentFolderId: folderId,
     });
 }
 
@@ -71,31 +84,48 @@ async function postUploadFile(req, res, next) {
 
     try {
         if (!req.file) {
-            return res.status(400).redirect("/files/upload");
+            return res.redirect('/files/upload');
         }
 
-        // const folderIdRaw = req.body.folderId;
-        // const folderId = folderIdRaw ? Number(folderIdRaw) : null;
+        const folderIdRaw = req.body.folderId;
+        const folderId = folderIdRaw ? Number(folderIdRaw) : null;
 
         const { prisma } = await import("../lib/prisma.mjs");
+
+        if (folderId !== null) {
+            const folder = await prisma.folder.findFirst({
+                where: {
+                    id: folderId,
+                    ownerId: req.user.id,
+                },
+            });
+
+            if (!folder) {
+                return res.status(403).send("Invalid folder");
+            }
+        }
 
         await prisma.file.create({
             data: {
                 ownerId: req.user.id,
-                folderId: null,
+                folderId,
                 originalName: req.file.originalname,
                 storagePath: req.file.path,
                 mimeType: req.file.mimetype,
                 sizeBytes: req.file.size,
-            }
+            },
         });
 
-        // if (folderId) return res.redirect(`/folders/${folderId}`);
-        return res.redirect('/');
+        if (folderId !== null) {
+            return res.redirect(`/folders/${folderId}`);
+        }
+
+        return res.redirect('/files');
     } catch (err) {
         return next(err);
     }
 }
+
 
 module.exports = {
     renderFiles,
