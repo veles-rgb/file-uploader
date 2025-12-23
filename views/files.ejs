@@ -7,21 +7,66 @@
 <body>
     <%- include("partials/header") %>
         <main>
-            <h1>Your files:</h1>
-            <% if (results && results.length> 0) { %>
-                <div>
-                    <% results.forEach(result=> { %>
-                        <div style="border: 1px solid red;">
-                            <img src="<%= result.previewUrl %>" alt="" width="100px">
-                            <div>
-                                <%= result.originalName %>
-                            </div>
-                            <button onclick="window.location.href='/files/<%= result.id %>'">View File</button>
-                        </div>
-                        <% }) %>
-                </div>
-                <% } else { %>
-                    <p>No files found.</p>
-                    <% } %>
+            <% if (currentUser) { %>
+                <button type="button" id="new-folder-btn">New Folder</button>
+                <form id="new-folder-form" action="/folders/create" method="POST" style="display:none;">
+                    <input type="hidden" name="name" id="new-folder-name" />
+                    <input type="hidden" name="parentId" value="<%= currentFolder ? currentFolder.id : '' %>" />
+                </form>
+                <button onclick="window.location.href='files/upload'">Upload File</button>
+                <script>
+                    (function () {
+                        const btn = document.getElementById("new-folder-btn");
+                        const form = document.getElementById("new-folder-form");
+                        const nameInput = document.getElementById("new-folder-name");
+
+                        btn.addEventListener("click", () => {
+                            const name = window.prompt("Folder name:");
+                            if (!name) return;
+
+                            const trimmed = name.trim();
+                            if (!trimmed) return;
+
+                            nameInput.value = trimmed;
+                            form.submit();
+                        });
+                    })();
+                </script>
+                <h1>Your files:</h1>
+                <% if (foldersFromDb && foldersFromDb.length> 0) { %>
+                    <div>
+                        <% foldersFromDb.forEach(folder=> { %>
+                            <a href="/folders/<%= folder.id %>">
+                                <div style="border: 1px solid black">
+                                    <img src="/icons/folder.svg" alt="">
+                                    <p>
+                                        <%= folder.name %>
+                                    </p>
+                                </div>
+                            </a>
+                            <% }) %>
+                    </div>
+                    <% } else { %>
+                        <p>No Folders</p>
+                        <% } %>
+                            <% if (results && results.length> 0) { %>
+                                <div>
+                                    <% results.forEach(result=> { %>
+                                        <a href="/files/<%= result.id %>">
+                                            <div style="border: 1px solid red;">
+                                                <img src="<%= result.previewUrl %>" alt="" width="100px">
+                                                <div>
+                                                    <%= result.originalName %>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <% }) %>
+                                </div>
+                                <% } else { %>
+                                    <p>No files.</p>
+                                    <% } %>
+                                        <% } else { %>
+                                            <h1>Unauthorized access</h1>
+                                            <% } %>
         </main>
 </body>
