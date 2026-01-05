@@ -42,10 +42,22 @@
                                                 <strong>
                                                     <%= result.originalName %>
                                                 </strong>
+                                                <div>
+                                                    File size: <%= result.sizeBytes %> bytes
+                                                </div>
+                                                <div>
+                                                    Uploaded: <%= result.createdAt %>
+                                                </div>
+                                                <form action="/files/<%= result.id %>/delete" method="post" onsubmit="return confirm(
+        '⚠️ This will permanently delete this file.\n\nThis action cannot be undone.'
+    );">
+                                                    <button type="submit"><img src="/icons/trash.svg" alt=""></button>
+                                                </form>
                                             </div>
                 </div>
                 <% } else { %>
                     <h1>File not found...</h1>
                     <% } %>
         </main>
+
 </body>
