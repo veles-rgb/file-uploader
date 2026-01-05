@@ -1,3 +1,9 @@
+ header {
+     display: flex;
+     align-items: center;
+     justify-content: space-around;
+ }
+
  .folder-dropdown {
      position: relative;
      display: inline-block;
@@ -60,4 +66,37 @@
      display: flex;
      flex-direction: column;
      border: 1px solid black;
+ }
+
+ .breadcrumbs {
+     display: flex;
+     align-items: center;
+     flex-wrap: wrap;
+     gap: 6px;
+
+     font-size: 14px;
+     margin-bottom: 12px;
+ }
+
+ .breadcrumbs a {
+     color: #2563eb;
+     /* soft blue */
+     text-decoration: none;
+     font-weight: 500;
+ }
+
+ .breadcrumbs a:hover {
+     text-decoration: underline;
+ }
+
+ .breadcrumbs span {
+     color: #6b7280;
+     /* muted gray */
+ }
+
+ .breadcrumbs .current {
+     color: #111827;
+     /* dark text */
+     font-weight: 600;
+     cursor: default;
  }
