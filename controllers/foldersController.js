@@ -1,3 +1,5 @@
+const buildFolderBreadcrumbs = require('../utils/pathBuilder');
+
 async function postCreateFolder(req, res, next) {
     if (!req.user) return res.redirect('/login');
 
@@ -60,12 +62,15 @@ async function getFolderById(req, res, next) {
             previewUrl: `/uploads/${path.basename(f.storagePath)}`,
         }));
 
+        const breadcrumbs = await buildFolderBreadcrumbs(prisma, userId, folder.id);
+
         res.render("folderId", {
             title: folder.name,
             currentFolderId: folder.id,
             folder,
             children,
             files,
+            breadcrumbs
         });
     } catch (error) {
         next(error);
