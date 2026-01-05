@@ -15,9 +15,10 @@ async function renderFiles(req, res, next) {
         });
 
         const path = require("node:path");
+        const toPreviewUrl = require('../utils/getPreviewUrl');
         const results = filesFromDb.map(f => ({
             ...f,
-            previewUrl: `/uploads/${path.basename(f.storagePath)}`
+            previewUrl: toPreviewUrl(f.storagePath),
         }));
 
         res.render('files', {
@@ -56,9 +57,10 @@ async function renderFileById(req, res, next) {
 
         const path = require("node:path");
 
+        const toPreviewUrl = require('../utils/getPreviewUrl');
         const result = {
             ...fileFromDb,
-            previewUrl: `/uploads/${path.basename(fileFromDb.storagePath)}`
+            previewUrl: toPreviewUrl(fileFromDb.storagePath),
         };
 
         const breadcrumbs = result.folderId
@@ -90,11 +92,11 @@ function renderUploadForm(req, res) {
 }
 
 async function postUploadFile(req, res, next) {
-    if (!req.user) return res.redirect('/login');
+    if (!req.user) return res.redirect("/login");
 
     try {
         if (!req.file) {
-            return res.redirect('/files/upload');
+            return res.redirect("/files/upload");
         }
 
         const folderIdRaw = req.body.folderId;
@@ -108,6 +110,7 @@ async function postUploadFile(req, res, next) {
                     id: folderId,
                     ownerId: req.user.id,
                 },
+                select: { id: true },
             });
 
             if (!folder) {
@@ -115,14 +118,28 @@ async function postUploadFile(req, res, next) {
             }
         }
 
+        const cloudinary = require("../utils/cloudinary");
+        const fs = require("node:fs/promises");
+
+        const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+            resource_type: "auto",
+            folder: "file-uploader",
+            use_filename: true,
+            unique_filename: true,
+        });
+
+        await fs.unlink(req.file.path);
+
         await prisma.file.create({
             data: {
                 ownerId: req.user.id,
                 folderId,
                 originalName: req.file.originalname,
-                storagePath: req.file.path,
+                storagePath: uploadResult.secure_url,
+                cloudinaryPublicId: uploadResult.public_id,
                 mimeType: req.file.mimetype,
                 sizeBytes: req.file.size,
+
             },
         });
 
@@ -130,11 +147,12 @@ async function postUploadFile(req, res, next) {
             return res.redirect(`/folders/${folderId}`);
         }
 
-        return res.redirect('/files');
+        return res.redirect("/files");
     } catch (err) {
         return next(err);
     }
 }
+
 
 async function deleteFile(req, res, next) {
     if (!req.user) return res.redirect("/login");
@@ -144,6 +162,30 @@ async function deleteFile(req, res, next) {
 
         const userId = req.user.id;
         const fileId = Number(req.params.id);
+
+        const fileFromDb = await prisma.file.findFirst({
+            where: { id: fileId, ownerId: userId },
+            select: { id: true, folderId: true, cloudinaryPublicId: true, mimeType: true },
+        });
+
+        if (!fileFromDb) {
+            return res.status(404).render("file", {
+                title: "File not found",
+                result: null,
+            });
+        }
+
+        if (fileFromDb.cloudinaryPublicId) {
+            const cloudinary = require("../utils/cloudinary");
+
+            let resourceType = "raw";
+            if (fileFromDb.mimeType && fileFromDb.mimeType.startsWith("image/")) resourceType = "image";
+            else if (fileFromDb.mimeType && fileFromDb.mimeType.startsWith("video/")) resourceType = "video";
+
+            await cloudinary.uploader.destroy(fileFromDb.cloudinaryPublicId, {
+                resource_type: resourceType,
+            });
+        }
 
         const result = await prisma.file.deleteMany({
             where: { id: fileId, ownerId: userId },
@@ -156,12 +198,15 @@ async function deleteFile(req, res, next) {
             });
         }
 
+        if (fileFromDb.folderId !== null) {
+            return res.redirect(`/folders/${fileFromDb.folderId}`);
+        }
+
         return res.redirect("/files");
     } catch (err) {
         return next(err);
     }
 }
-
 
 module.exports = {
     renderFiles,
