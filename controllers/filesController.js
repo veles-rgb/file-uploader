@@ -1,3 +1,5 @@
+const buildFolderBreadcrumbs = require("../utils/pathBuilder");
+
 async function renderFiles(req, res, next) {
     if (!req.user) return res.redirect('/login');
 
@@ -35,6 +37,8 @@ async function renderFileById(req, res, next) {
     try {
         const { prisma } = await import("../lib/prisma.mjs");
 
+        const userId = req.user.id;
+
         const fileFromDb = await prisma.file.findUnique({
             where: { id: Number(req.params.id) }
         });
@@ -57,9 +61,15 @@ async function renderFileById(req, res, next) {
             previewUrl: `/uploads/${path.basename(fileFromDb.storagePath)}`
         };
 
+        const breadcrumbs = result.folderId
+            ? await buildFolderBreadcrumbs(prisma, userId, result.folderId)
+            : [];
+
         res.render('filesId', {
             title: result.originalName,
-            result
+            result,
+            breadcrumbs,
+            currentFolderId: null
         });
     } catch (error) {
         return next(error);
