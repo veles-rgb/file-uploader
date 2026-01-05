@@ -126,10 +126,37 @@ async function postUploadFile(req, res, next) {
     }
 }
 
+async function deleteFile(req, res, next) {
+    if (!req.user) return res.redirect("/login");
+
+    try {
+        const { prisma } = await import("../lib/prisma.mjs");
+
+        const userId = req.user.id;
+        const fileId = Number(req.params.id);
+
+        const result = await prisma.file.deleteMany({
+            where: { id: fileId, ownerId: userId },
+        });
+
+        if (result.count === 0) {
+            return res.status(404).render("file", {
+                title: "File not found",
+                result: null,
+            });
+        }
+
+        return res.redirect("/files");
+    } catch (err) {
+        return next(err);
+    }
+}
+
 
 module.exports = {
     renderFiles,
     renderFileById,
     renderUploadForm,
     postUploadFile,
+    deleteFile
 };
