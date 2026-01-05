@@ -2,6 +2,7 @@
     <title>
         <% title %>
     </title>
+    <link rel="stylesheet" href="/styles.css">
 </head>
 
 <body>
@@ -15,34 +16,38 @@
                     <input type="hidden" name="name" id="new-folder-name" />
                     <input type="hidden" name="parentId" value="<%= currentFolderId ? currentFolderId : '' %>" />
                 </form>
-                <script>
-                    (function () {
-                        const btn = document.getElementById("new-folder-btn");
-                        const form = document.getElementById("new-folder-form");
-                        const nameInput = document.getElementById("new-folder-name");
-
-                        btn.addEventListener("click", () => {
-                            const name = window.prompt("Folder name:");
-                            if (!name) return;
-
-                            const trimmed = name.trim();
-                            if (!trimmed) return;
-
-                            nameInput.value = trimmed;
-                            form.submit();
-                        });
-                    })();
-                </script>
                 <% if (children && children.length> 0) { %>
                     <div>
-                        <% children.forEach(child=> { %>
-                            <div>
-                                <a href="/folders/<%= child.id %>">
+                        <% children.forEach(folder=> { %>
+                            <div class="folder-item">
+                                <a href="/folders/<%= folder.id %>">
                                     <img src="/icons/folder.svg" alt="">
                                     <p>
-                                        <%= child.name %>
+                                        <%= folder.name %>
                                     </p>
                                 </a>
+                                <div class="folder-dropdown">
+                                    <img src="/icons/edit.svg" class="dropdown-toggle">
+
+                                    <div class="dropdown-content">
+                                        <form action="/folders/<%= folder.id %>/rename" method="POST">
+                                            <input type="text" name="name" value="<%= folder.name %>" required
+                                                minlength="1" />
+
+                                            <button type="submit">
+                                                Rename
+                                            </button>
+                                        </form>
+
+                                        <form action="/folders/<%= folder.id %>/delete" method="POST" onsubmit="return confirm(
+        '⚠️ This will permanently delete this folder AND everything inside it.\n\nThis action cannot be undone.'
+    );">
+                                            <button type="submit" class="danger">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
 
                             </div>
                             <% }) %>
@@ -55,10 +60,14 @@
                                 <div>
                                     <% files.forEach(file=> { %>
                                         <div>
-                                            <img src="<%= file.previewUrl %>" alt="" width="100px">
-                                            <p>
-                                                <%= file.originalName %>
-                                            </p>
+                                            <a href="/files/<%= file.id %>">
+                                                <div style="border: 1px solid red;">
+                                                    <img src="<%= file.previewUrl %>" alt="" width="100px">
+                                                    <div>
+                                                        <%= file.originalName %>
+                                                    </div>
+                                                </div>
+                                            </a>
                                         </div>
                                         <% }) %>
                                 </div>
@@ -69,4 +78,49 @@
                                             <h1>Unauthorized access.</h1>
                                             <% } %>
         </main>
+        <script>
+            (function () {
+                const btn = document.getElementById("new-folder-btn");
+                const form = document.getElementById("new-folder-form");
+                const nameInput = document.getElementById("new-folder-name");
+
+                btn.addEventListener("click", () => {
+                    const name = window.prompt("Folder name:");
+                    if (!name) return;
+
+                    const trimmed = name.trim();
+                    if (!trimmed) return;
+
+                    nameInput.value = trimmed;
+                    form.submit();
+                });
+            })();
+        </script>
+        <script>
+            document.addEventListener("click", (e) => {
+                const clickedDropdown = e.target.closest(".folder-dropdown");
+                const clickedToggle = e.target.closest(".dropdown-toggle");
+                const clickedMenu = e.target.closest(".dropdown-content");
+
+                // Clicked completely outside any dropdown => close all
+                if (!clickedDropdown) {
+                    document.querySelectorAll(".folder-dropdown.open")
+                        .forEach(d => d.classList.remove("open"));
+                    return;
+                }
+
+                // Clicked inside the menu (input, buttons, form, etc.) => keep it open
+                if (clickedMenu && !clickedToggle) {
+                    return;
+                }
+
+                // Clicked the toggle icon => toggle this dropdown, close others
+                document.querySelectorAll(".folder-dropdown.open")
+                    .forEach(d => { if (d !== clickedDropdown) d.classList.remove("open"); });
+
+                if (clickedToggle) {
+                    clickedDropdown.classList.toggle("open");
+                }
+            });
+        </script>
 </body>
