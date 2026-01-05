@@ -57,9 +57,10 @@ async function getFolderById(req, res, next) {
             orderBy: { createdAt: "desc" },
         });
 
+        const toPreviewUrl = require('../utils/getPreviewUrl');
         const files = filesInFolder.map((f) => ({
             ...f,
-            previewUrl: `/uploads/${path.basename(f.storagePath)}`,
+            previewUrl: toPreviewUrl(f.storagePath),
         }));
 
         const breadcrumbs = await buildFolderBreadcrumbs(prisma, userId, folder.id);
@@ -113,6 +114,25 @@ async function renameFolder(req, res, next) {
 }
 
 async function deleteFolderTree(prisma, folderId, userId) {
+    const cloudinary = require("../utils/cloudinary");
+
+    const filesInFolder = await prisma.file.findMany({
+        where: { folderId, ownerId: userId },
+        select: { id: true, cloudinaryPublicId: true, mimeType: true },
+    });
+
+    for (const f of filesInFolder) {
+        if (!f.cloudinaryPublicId) continue;
+
+        let resourceType = "raw";
+        if (f.mimeType && f.mimeType.startsWith("image/")) resourceType = "image";
+        else if (f.mimeType && f.mimeType.startsWith("video/")) resourceType = "video";
+
+        await cloudinary.uploader.destroy(f.cloudinaryPublicId, {
+            resource_type: resourceType,
+        });
+    }
+
     await prisma.file.deleteMany({
         where: { folderId, ownerId: userId }
     });
@@ -141,7 +161,8 @@ async function deleteFolder(req, res, next) {
         const userId = req.user.id;
 
         const folder = await prisma.folder.findFirst({
-            where: { id: folderId, ownerId: userId }
+            where: { id: folderId, ownerId: userId },
+            select: { id: true, parentId: true }
         });
 
         if (!folder) {
@@ -153,7 +174,8 @@ async function deleteFolder(req, res, next) {
 
         await deleteFolderTree(prisma, folderId, userId);
 
-        res.redirect("/");
+        if (folder.parentId) return res.redirect(`/folders/${folder.parentId}`);
+        return res.redirect("/files");
     } catch (err) {
         next(err);
     }
