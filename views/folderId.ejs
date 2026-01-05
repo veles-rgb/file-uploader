@@ -8,6 +8,34 @@
 <body>
     <%- include("partials/header") %>
         <main>
+            <nav class="breadcrumbs">
+                <a href="/files">files</a>
+
+                <% if (breadcrumbs && breadcrumbs.length) { %>
+                    <% breadcrumbs.forEach((b, idx)=> { %>
+                        <span>/</span>
+
+                        <% if (idx===breadcrumbs.length - 1 && folder) { %>
+                            <span>
+                                <%= b.name %>
+                            </span>
+                            <% } else { %>
+                                <a href="/folders/<%= b.id %>">
+                                    <%= b.name %>
+                                </a>
+                                <% } %>
+
+                                    <% }) %>
+                                        <% } %>
+
+                                            <% if (typeof result !=="undefined" && result && result.originalName) { %>
+                                                <span>/</span>
+                                                <span>
+                                                    <%= result.originalName %>
+                                                </span>
+                                                <% } %>
+            </nav>
+
             <% if (currentUser) { %>
                 <button onclick="window.location.href='/files/upload?folderId=<%= currentFolderId %>'">Upload
                     File</button>
