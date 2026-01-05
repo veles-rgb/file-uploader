@@ -55,6 +55,8 @@ model File {
   mimeType     String   @db.VarChar(120)
   sizeBytes    Int
   createdAt    DateTime @default(now())
+  
+  cloudinaryPublicId String?
 
   owner  User    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   folder Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
