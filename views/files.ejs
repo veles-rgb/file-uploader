@@ -31,7 +31,7 @@
                                     <div class="dropdown-content">
                                         <form action="/folders/<%= folder.id %>/rename" method="POST">
                                             <input type="text" name="name" value="<%= folder.name %>" required
-                                                minlength="1" />
+                                                minlength="1" maxlength="120" />
 
                                             <button type="submit">
                                                 Rename
@@ -58,15 +58,36 @@
                                 <div>
                                     <% results.forEach(result=> { %>
                                         <div>
-                                            <a href="/files/<%= result.id %>">
-                                                <div style="border: 1px solid red;">
-                                                    <img src="<%= result.previewUrl %>" alt="" width="100px">
-                                                    <div>
-                                                        <%= result.originalName %>
-                                                    </div>
+                                            <a href="/files/<%= result.id %>"
+                                                style="text-decoration: none; color: inherit;">
+                                                <div class="file-card">
+
+                                                    <% if (result.mimeType.startsWith("image/")) { %>
+                                                        <img src="<%= result.previewUrl %>"
+                                                            alt="<%= result.originalName %>" width="64">
+
+                                                        <% } else if (result.mimeType.startsWith("video/")) { %>
+                                                            <img src="/icons/video.svg" width="64">
+
+                                                            <% } else if (result.mimeType.startsWith("audio/")) { %>
+                                                                <img src="/icons/music.svg" alt="Audio" width="64">
+
+                                                                <% } else if (result.mimeType==="application/pdf" ) { %>
+                                                                    <img src="/icons/file.svg" alt="PDF" width="64">
+
+                                                                    <% } else { %>
+                                                                        <img src="/icons/file.svg" alt="File"
+                                                                            width="64">
+                                                                        <% } %>
+
+                                                                            <div class="file-name">
+                                                                                <%= result.originalName %>
+                                                                            </div>
+
                                                 </div>
                                             </a>
                                         </div>
+
                                         <% }) %>
                                 </div>
                                 <% } else { %>
