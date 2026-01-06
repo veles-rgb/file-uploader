@@ -23,9 +23,6 @@ const assetsPath = path.join(__dirname, "public");
     app.use(express.urlencoded({ extended: false }));
     app.use(express.static(assetsPath));
 
-    // Make uploads public FOR NOW
-    app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
     // Sessions store using PrismaSessionStore
     app.use(
         session({
