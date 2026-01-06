@@ -36,8 +36,9 @@ async function getFolderById(req, res, next) {
         });
 
         if (!folder || folder.ownerId !== userId) {
-            return res.status(404).render("notFound", {
+            return res.status(404).render("error", {
                 title: "Folder not found",
+                message: "That folder does not exist."
             });
         }
 
@@ -101,8 +102,9 @@ async function renameFolder(req, res, next) {
         });
 
         if (result.count === 0) {
-            return res.status(404).render("file", {
+            return res.status(404).render("error", {
                 title: "Folder not found",
+                message: 'Folder not found.',
                 result: null,
             });
         }
@@ -176,8 +178,9 @@ async function deleteFolder(req, res, next) {
         });
 
         if (!folder) {
-            return res.status(404).render("file", {
+            return res.status(404).render("error", {
                 title: "Folder not found",
+                message: "Folder not found.",
                 result: null
             });
         }
