@@ -45,12 +45,9 @@ async function renderFileById(req, res, next) {
         });
 
         if (!fileFromDb) {
-            return res.status(404).render("file", {
-                // THIS WONT WORK
-                // THIS WONT WORK
-                // THIS WONT WORK
-                // THIS WONT WORK
+            return res.status(404).render("error", {
                 title: "File not found",
+                message: "File does not exist.",
                 result: null
             });
         }
@@ -169,8 +166,9 @@ async function deleteFile(req, res, next) {
         });
 
         if (!fileFromDb) {
-            return res.status(404).render("file", {
+            return res.status(404).render("error", {
                 title: "File not found",
+                message: "File not found",
                 result: null,
             });
         }
@@ -202,8 +200,9 @@ async function deleteFile(req, res, next) {
         });
 
         if (result.count === 0) {
-            return res.status(404).render("file", {
+            return res.status(404).render("error", {
                 title: "File not found",
+                message: "File not found",
                 result: null,
             });
         }
