@@ -178,13 +178,23 @@ async function deleteFile(req, res, next) {
         if (fileFromDb.cloudinaryPublicId) {
             const cloudinary = require("../utils/cloudinary");
 
-            let resourceType = "raw";
-            if (fileFromDb.mimeType && fileFromDb.mimeType.startsWith("image/")) resourceType = "image";
-            else if (fileFromDb.mimeType && fileFromDb.mimeType.startsWith("video/")) resourceType = "video";
+            const candidates = [];
 
-            await cloudinary.uploader.destroy(fileFromDb.cloudinaryPublicId, {
-                resource_type: resourceType,
-            });
+            if (fileFromDb.mimeType && fileFromDb.mimeType.startsWith("image/")) {
+                candidates.push("image", "raw", "video");
+            } else if (fileFromDb.mimeType && fileFromDb.mimeType.startsWith("video/")) {
+                candidates.push("video", "raw", "image");
+            } else {
+                candidates.push("raw", "image", "video");
+            }
+
+            for (const resourceType of candidates) {
+                const resp = await cloudinary.uploader.destroy(fileFromDb.cloudinaryPublicId, {
+                    resource_type: resourceType,
+                });
+
+                if (resp && resp.result === "ok") break;
+            }
         }
 
         const result = await prisma.file.deleteMany({
