@@ -124,13 +124,23 @@ async function deleteFolderTree(prisma, folderId, userId) {
     for (const f of filesInFolder) {
         if (!f.cloudinaryPublicId) continue;
 
-        let resourceType = "raw";
-        if (f.mimeType && f.mimeType.startsWith("image/")) resourceType = "image";
-        else if (f.mimeType && f.mimeType.startsWith("video/")) resourceType = "video";
+        const candidates = [];
 
-        await cloudinary.uploader.destroy(f.cloudinaryPublicId, {
-            resource_type: resourceType,
-        });
+        if (f.mimeType && f.mimeType.startsWith("image/")) {
+            candidates.push("image", "raw", "video");
+        } else if (f.mimeType && f.mimeType.startsWith("video/")) {
+            candidates.push("video", "raw", "image");
+        } else {
+            candidates.push("raw", "image", "video");
+        }
+
+        for (const resourceType of candidates) {
+            const resp = await cloudinary.uploader.destroy(f.cloudinaryPublicId, {
+                resource_type: resourceType,
+            });
+
+            if (resp && resp.result === "ok") break;
+        }
     }
 
     await prisma.file.deleteMany({
