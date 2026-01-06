@@ -60,7 +60,7 @@
                                     <div class="dropdown-content">
                                         <form action="/folders/<%= folder.id %>/rename" method="POST">
                                             <input type="text" name="name" value="<%= folder.name %>" required
-                                                minlength="1" />
+                                                minlength="1" maxlength="120" />
 
                                             <button type="submit">
                                                 Rename
@@ -88,15 +88,35 @@
                                 <div>
                                     <% files.forEach(file=> { %>
                                         <div>
-                                            <a href="/files/<%= file.id %>">
-                                                <div style="border: 1px solid red;">
-                                                    <img src="<%= file.previewUrl %>" alt="" width="100px">
-                                                    <div>
-                                                        <%= file.originalName %>
-                                                    </div>
+                                            <a href="/files/<%= file.id %>"
+                                                style="text-decoration: none; color: inherit;">
+                                                <div class="file-card">
+
+                                                    <% if (file.mimeType.startsWith("image/")) { %>
+                                                        <img src="<%= file.previewUrl %>" alt="<%= file.originalName %>"
+                                                            width="64">
+
+                                                        <% } else if (file.mimeType.startsWith("video/")) { %>
+                                                            <img src="/icons/video.svg" alt="Video" width="64">
+
+                                                            <% } else if (file.mimeType.startsWith("audio/")) { %>
+                                                                <img src="/icons/music.svg" alt="Audio" width="64">
+
+                                                                <% } else if (file.mimeType==="application/pdf" ) { %>
+                                                                    <img src="/icons/file.svg" alt="PDF" width="64">
+
+                                                                    <% } else { %>
+                                                                        <img src="/icons/file.svg" alt="File"
+                                                                            width="64">
+                                                                        <% } %>
+
+                                                                            <div class="file-name">
+                                                                                <%= file.originalName %>
+                                                                            </div>
                                                 </div>
                                             </a>
                                         </div>
+
                                         <% }) %>
                                 </div>
                                 <% } else { %>
@@ -115,6 +135,7 @@
                 btn.addEventListener("click", () => {
                     const name = window.prompt("Folder name:");
                     if (!name) return;
+                    if (name.length > 120) return;
 
                     const trimmed = name.trim();
                     if (!trimmed) return;
@@ -130,19 +151,16 @@
                 const clickedToggle = e.target.closest(".dropdown-toggle");
                 const clickedMenu = e.target.closest(".dropdown-content");
 
-                // Clicked completely outside any dropdown => close all
                 if (!clickedDropdown) {
                     document.querySelectorAll(".folder-dropdown.open")
                         .forEach(d => d.classList.remove("open"));
                     return;
                 }
 
-                // Clicked inside the menu (input, buttons, form, etc.) => keep it open
                 if (clickedMenu && !clickedToggle) {
                     return;
                 }
 
-                // Clicked the toggle icon => toggle this dropdown, close others
                 document.querySelectorAll(".folder-dropdown.open")
                     .forEach(d => { if (d !== clickedDropdown) d.classList.remove("open"); });
 
