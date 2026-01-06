@@ -15,4 +15,11 @@ const storage = multer.diskStorage({
     },
 });
 
-module.exports = multer({ storage });
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+module.exports = multer({
+    storage,
+    limits: {
+        fileSize: MAX_FILE_SIZE
+    }
+});
