@@ -47,6 +47,7 @@ const assetsPath = path.join(__dirname, "public");
     const authRouter = require("./routers/authRouter.js");
     const filesRouter = require("./routers/filesRouter.js");
     const foldersRouter = require("./routers/foldersRouter.js");
+    const shareRouter = require("./routers/shareRouter.js");
 
     // Passport Local Strategy (bcrypt)
     passport.use(
@@ -100,6 +101,7 @@ const assetsPath = path.join(__dirname, "public");
     app.use('/', authRouter);
     app.use('/files', filesRouter);
     app.use('/folders', foldersRouter);
+    app.use('/share', shareRouter);
 
 
     const PORT = process.env.PORT || 3001;
