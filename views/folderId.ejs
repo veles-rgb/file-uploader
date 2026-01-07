@@ -67,6 +67,9 @@
                                             </button>
                                         </form>
 
+                                        <button
+                                            onclick="window.location.href='/share/folder/<%= folder.id %>'">Share</button>
+
                                         <form action="/folders/<%= folder.id %>/delete" method="POST" onsubmit="return confirm(
         '⚠️ This will permanently delete this folder AND everything inside it.\n\nThis action cannot be undone.'
     );">
