@@ -1,0 +1,5 @@
+TODO
+
+- Finish shareToken view, display all folders and files that are within the shared folder (/share/:token)
+- Create renderShareFolder controller function and view (share/:token/folders/:folderId)
+- Create renderShareFile controller function and view (share/:token/files/:fileId)
