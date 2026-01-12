@@ -1,0 +1,95 @@
+<head>
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body>
+    <%- include("partials/header") %>
+
+        <main>
+
+            <nav class="breadcrumbs">
+                <% if (breadcrumbs && breadcrumbs.length) { %>
+                    <% breadcrumbs.forEach((b)=> { %>
+                        <span>/</span>
+                        <% if (b.href) { %>
+                            <a href="<%= b.href %>">
+                                <%= b.name %>
+                            </a>
+                            <% } else { %>
+                                <span>
+                                    <%= b.name %>
+                                </span>
+                                <% } %>
+                                    <% }) %>
+                                        <% } %>
+
+                                            <% if (file && file.originalName) { %>
+                                                <span>/</span>
+                                                <span class="current">
+                                                    <%= file.originalName %>
+                                                </span>
+                                                <% } %>
+            </nav>
+
+            <% if (file) { %>
+                <div class="file-preview">
+
+                    <% if (file.mimeType && file.mimeType.startsWith("image/")) { %>
+                        <img src="<%= file.previewUrl %>" alt="<%= file.originalName %>"
+                            style="max-width: 100%; max-height: 500px;">
+
+                        <% } else if (file.mimeType && file.mimeType.startsWith("video/")) { %>
+                            <video src="<%= file.previewUrl %>" controls style="max-width: 100%; max-height: 500px;">
+                                Your browser does not support video playback.
+                            </video>
+
+                            <% } else if (file.mimeType && file.mimeType.startsWith("audio/")) { %>
+                                <audio src="<%= file.previewUrl %>" controls>
+                                    Your browser does not support audio playback.
+                                </audio>
+
+                                <% } else if (file.mimeType==="application/pdf" ) { %>
+                                    <object data="<%= file.previewUrl %>" type="application/pdf"
+                                        style="width: 100%; height: 600px;">
+                                        <p>
+                                            PDF preview not available.
+                                            <a href="<%= file.previewUrl %>" target="_blank" rel="noopener">Open PDF</a>
+                                        </p>
+                                    </object>
+
+                                    <% } else { %>
+                                        <div class="no-preview">
+                                            <p>No preview available for this file type.</p>
+                                            <a href="<%= file.previewUrl %>" target="_blank" rel="noopener">
+                                                Open file
+                                            </a>
+                                        </div>
+                                        <% } %>
+
+                </div>
+
+                <div class="file-meta">
+                    <a href="<%= file.previewUrl %>" download>Download</a>
+                    <div>
+                        <strong>
+                            <%= file.originalName %>
+                        </strong>
+                    </div>
+                    <div>
+                        File size: <%= file.sizeBytes %> bytes
+                    </div>
+
+                    <div>
+                        Uploaded: <%= file.createdAt %>
+                    </div>
+                </div>
+
+                <% } else { %>
+                    <h1>File not found...</h1>
+                    <% } %>
+
+        </main>
+</body>
