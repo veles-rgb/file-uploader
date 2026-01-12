@@ -58,7 +58,7 @@ async function getFolderById(req, res, next) {
             orderBy: { createdAt: "desc" },
         });
 
-        const toPreviewUrl = require('../utils/getPreviewUrl');
+        const toPreviewUrl = require("../utils/getPreviewUrl");
         const files = filesInFolder.map((f) => ({
             ...f,
             previewUrl: toPreviewUrl(f.storagePath),
@@ -66,18 +66,28 @@ async function getFolderById(req, res, next) {
 
         const breadcrumbs = await buildFolderBreadcrumbs(prisma, userId, folder.id);
 
+        const isSharedFolder = require("../utils/isSharedFolder");
+        const shareToken = await isSharedFolder(folder.id, userId);
+
+        const shareUrl = shareToken
+            ? `${req.protocol}://${req.get("host")}/share/${shareToken}`
+            : null;
+
         res.render("folderId", {
             title: folder.name,
             currentFolderId: folder.id,
             folder,
             children,
             files,
-            breadcrumbs
+            breadcrumbs,
+            shareToken,
+            shareUrl,
         });
     } catch (error) {
         next(error);
     }
 }
+
 
 async function renameFolder(req, res, next) {
     if (!req.user) return res.redirect("/login");
