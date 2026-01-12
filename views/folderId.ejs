@@ -1,6 +1,6 @@
 <head>
     <title>
-        <% title %>
+        <%= title %>
     </title>
     <link rel="stylesheet" href="/styles.css">
 </head>
@@ -27,7 +27,6 @@
 
                                     <% }) %>
                                         <% } %>
-
                                             <% if (typeof result !=="undefined" && result && result.originalName) { %>
                                                 <span>/</span>
                                                 <span>
@@ -37,13 +36,35 @@
             </nav>
 
             <% if (currentUser) { %>
-                <button onclick="window.location.href='/files/upload?folderId=<%= currentFolderId %>'">Upload
-                    File</button>
-                <button type="button" id="new-folder-btn">New Folder</button>
-                <form id="new-folder-form" action="/folders/create" method="POST" style="display:none;">
-                    <input type="hidden" name="name" id="new-folder-name" />
-                    <input type="hidden" name="parentId" value="<%= currentFolderId ? currentFolderId : '' %>" />
-                </form>
+                <div>
+                    <div>
+                        <button onclick="window.location.href='/files/upload?folderId=<%= currentFolderId %>'">Upload
+                            File</button>
+                        <button type="button" id="new-folder-btn">New Folder</button>
+                        <form id="new-folder-form" action="/folders/create" method="POST" style="display:none;">
+                            <input type="hidden" name="name" id="new-folder-name" />
+                            <input type="hidden" name="parentId"
+                                value="<%= currentFolderId ? currentFolderId : '' %>" />
+                        </form>
+                    </div>
+
+                    <% if (shareToken) { %>
+                        <div>
+                            <p>This folder is being shared.</p>
+                            <div>
+                                <form action="/share/<%= currentFolderId %>/unshare" method="post"
+                                    onsubmit="return confirm('Are you sure you want to remove public sharing for this folder?');">
+                                    <button type="submit">Unshare</button>
+                                </form>
+                                <% if (shareUrl) { %>
+                                    <button type="button" class="copy-btn" data-copy="<%= shareUrl %>">Copy
+                                        link</button>
+                                    <% } %>
+
+                            </div>
+                        </div>
+                        <% } %>
+                </div>
                 <% if (children && children.length> 0) { %>
                     <div>
                         <% children.forEach(folder=> { %>
@@ -172,4 +193,41 @@
                 }
             });
         </script>
+        <script>
+            (function () {
+                const btn = document.querySelector(".copy-btn");
+                if (!btn) return;
+
+                const status = document.getElementById("copyStatus");
+
+                btn.addEventListener("click", async () => {
+                    const text = btn.dataset.copy || document.getElementById("shareLink")?.value || "";
+
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        if (status) {
+                            status.style.display = "inline";
+                            status.textContent = "Copied!";
+                            setTimeout(() => (status.style.display = "none"), 1200);
+                        }
+                    } catch (e) {
+                        const input = document.getElementById("shareLink");
+                        if (!input) return;
+
+                        input.hidden = false;
+                        input.select();
+                        input.setSelectionRange(0, input.value.length);
+                        document.execCommand("copy");
+                        input.hidden = true;
+
+                        if (status) {
+                            status.style.display = "inline";
+                            status.textContent = "Copied!";
+                            setTimeout(() => (status.style.display = "none"), 1200);
+                        }
+                    }
+                });
+            })();
+        </script>
+
 </body>
