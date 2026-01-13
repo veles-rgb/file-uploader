@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-folder" xmlns:bx="https://boxy-svg.com">
+  <defs>
+    <style bx:fonts="Atma">@import url(https://fonts.googleapis.com/css2?family=Atma%3Aital%2Cwght%400%2C300%3B0%2C400%3B0%2C500%3B0%2C600%3B0%2C700&amp;display=swap);</style>
+  </defs>
+  <path d="M 22 19 C 22 20.105 21.105 21 20 21 L 4 21 C 2.895 21 2 20.105 2 19 L 2 5 C 2 3.895 2.895 3 4 3 L 9 3 L 11 6 L 20 6 C 21.105 6 22 6.895 22 8 L 22 19 Z" style="stroke: rgb(37, 99, 235);"/>
+  <text style="fill: rgb(51, 51, 51); font-family: Atma; font-size: 10px; font-style: italic; letter-spacing: 2px; stroke: rgb(37, 99, 235); white-space: pre;" x="4.21" y="17.427">VF</text>
+</svg>
