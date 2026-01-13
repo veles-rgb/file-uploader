@@ -7,11 +7,19 @@
 
 <body>
     <%- include("partials/header") %>
-        <main>
+        <main class="index-main">
             <% if (!currentUser) { %>
-                <p>Please <a href="/login">login</a> to start using veles file!</p>
+                <div>
+                    <h3>Welcome to Veles Files, free file hosting for thee!</h3>
+                    <p>Please <a href="/login">login</a> or <a href="/register">register</a> to start using veles file.
+                    </p>
+                </div>
                 <% } else { %>
-                    <a href="/files">Open Files</a>
+                    <div>
+                        <h3>Hi, <%= currentUser.username %>!</h3>
+                        <p>View your files.</p>
+                        <button onclick="window.location.href='/files'">View Files</button>
+                    </div>
                     <% } %>
         </main>
 </body>
