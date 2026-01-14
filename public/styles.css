@@ -260,3 +260,120 @@ header {
 .index-main button:hover {
     cursor: pointer;
 }
+
+/* LOGIN / REGISTER FORM */
+.form-main {
+    display: grid;
+    place-items: center;
+    text-align: center;
+}
+
+.form-main form {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--accent-soft);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--accent-primary);
+    padding: 2rem;
+    width: 25rem;
+}
+
+.form-main form h1 {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: var(--accent-primary);
+}
+
+.form-main form label {
+    margin-top: 1rem;
+    letter-spacing: 0.02em;
+    font-weight: 600;
+    text-align: left;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.form-main form input {
+    width: 100%;
+    margin-top: 0.4rem;
+    border: 1px solid var(--border-hover);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.1rem;
+    height: auto;
+    box-sizing: border-box;
+}
+
+.form-main form input:focus {
+    border-color: var(--accent-primary);
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent-primary);
+}
+
+.form-main form button {
+    background-color: var(--accent-primary);
+    width: 10rem;
+    height: 3rem;
+    border-radius: var(--radius-md);
+    border: none;
+    margin: 1rem 0 0 0;
+    align-self: center;
+    font-size: large;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: var(--text-inverse);
+}
+
+.form-main form button:hover {
+    cursor: pointer;
+}
+
+/* auth errors */
+.auth-errors {
+    background-color: rgba(250, 109, 109, 0.50);
+    border: 2px solid red;
+    border-radius: var(--radius-md);
+    padding: 1rem;
+}
+
+.auth-errors li {
+    list-style: decimal;
+    list-style-type: none;
+    padding-left: 1em;
+    text-align: left;
+    font-weight: 600;
+}
+
+.auth-errors li::before {
+    content: "– ";
+    position: absolute;
+    margin-left: -1em;
+}
+
+/* Upload file */
+.form-main input[type="file"] {
+    border: 2px dotted var(--accent-primary);
+    height: 8rem;
+    padding-left: 0;
+}
+
+.file-input-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.file-input-wrap input[type="file"] {
+    text-align: center;
+    padding: 1rem;
+    background-color: var(--bg-muted);
+}
+
+.file-input-wrap input[type="file"]::file-selector-button {
+    display: block;
+    margin: 0 auto 0.5rem auto;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    border: none;
+    background: var(--bg-muted);
+    border: 2px solid var(--accent-primary);
+    color: var(--text-primary);
+    font-weight: 600;
+    cursor: pointer;
+}
