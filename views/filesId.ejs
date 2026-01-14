@@ -8,7 +8,7 @@
 <body>
     <%- include("partials/header") %>
 
-        <main>
+        <main class="viewer-main">
             <nav class="breadcrumbs">
                 <a href="/files">files</a>
 
@@ -28,7 +28,7 @@
                                     <% }) %>
                                         <% } %>
 
-                                            <% if (typeof result !=="undefined" && result && result.originalName) { %>
+                                            <% if (result && result.originalName) { %>
                                                 <span>/</span>
                                                 <span class="current">
                                                     <%= result.originalName %>
@@ -37,71 +37,71 @@
             </nav>
 
             <% if (result) { %>
-
-                <div class="file-preview">
-                    <% if (result.mimeType.startsWith("image/")) { %>
-                        <img src="<%= result.previewUrl %>" alt="<%= result.originalName %>"
-                            style="max-width: 100%; max-height: 500px;">
-
-                        <% } else if (result.mimeType.startsWith("video/")) { %>
-                            <video src="<%= result.previewUrl %>" controls style="max-width: 100%; max-height: 500px;">
-                                Your browser does not support video playback.
-                            </video>
-
-                            <% } else if (result.mimeType.startsWith("audio/")) { %>
-                                <audio src="<%= result.previewUrl %>" controls>
-                                    Your browser does not support audio playback.
-                                </audio>
-
-                                <% } else if (result.mimeType==="application/pdf" || (result.previewUrl &&
-                                    result.previewUrl.toLowerCase().includes(".pdf"))) { %>
-                                    <object data="<%= result.previewUrl %>" type="application/pdf"
-                                        style="width: 100%; height: 600px;">
-                                        <p>
-                                            PDF preview not available.
-                                            <a href="<%= result.previewUrl %>" target="_blank" rel="noopener">Open
-                                                PDF</a>
-                                        </p>
-                                    </object>
-
-                                    <% } else { %>
-                                        <div class="no-preview">
-                                            <p>No preview available for this file type.</p>
-                                            <a href="<%= result.previewUrl %>" target="_blank" rel="noopener">
-                                                Open file
-                                            </a>
-                                        </div>
-                                        <% } %>
-                </div>
-
-                <div class="file-meta">
-                    <a href="<%= result.previewUrl %>" download>Download</a>
-
-                    <div>
-                        <strong>
-                            <%= result.originalName %>
-                        </strong>
+                <section class="viewer-layout">
+                    <div class="file-preview">
+                        <% if (result.mimeType && result.mimeType.startsWith("image/")) { %>
+                            <img class="preview-media" src="<%= result.previewUrl %>" alt="<%= result.originalName %>">
+                            <% } else if (result.mimeType && result.mimeType.startsWith("video/")) { %>
+                                <video class="preview-media" src="<%= result.previewUrl %>" controls>
+                                    Your browser does not support video playback.
+                                </video>
+                                <% } else if (result.mimeType && result.mimeType.startsWith("audio/")) { %>
+                                    <audio class="preview-audio" src="<%= result.previewUrl %>" controls>
+                                        Your browser does not support audio playback.
+                                    </audio>
+                                    <% } else if ( result.mimeType==="application/pdf" || (result.previewUrl &&
+                                        result.previewUrl.toLowerCase().includes(".pdf")) ) { %>
+                                        <object class="preview-pdf" data="<%= result.previewUrl %>"
+                                            type="application/pdf">
+                                            <p>
+                                                PDF preview not available.
+                                                <a href="<%= result.previewUrl %>" target="_blank" rel="noopener">Open
+                                                    PDF</a>
+                                            </p>
+                                        </object>
+                                        <% } else { %>
+                                            <div class="no-preview">
+                                                <p>No preview available for this file type.</p>
+                                                <a href="<%= result.previewUrl %>" target="_blank" rel="noopener">Open
+                                                    file</a>
+                                            </div>
+                                            <% } %>
                     </div>
 
-                    <div>
-                        File size: <%= result.sizeBytes %> bytes
-                    </div>
+                    <aside class="file-meta">
+                        <a class="btn btn-primary" href="<%= result.previewUrl %>" download>Download</a>
 
-                    <div>
-                        Uploaded: <%= result.createdAt %>
-                    </div>
+                        <div class="meta-block">
+                            <div class="meta-title">
+                                <%= result.originalName %>
+                            </div>
+                        </div>
 
-                    <form action="/files/<%= result.id %>/delete" method="post"
-                        onsubmit="return confirm('⚠️ This will permanently delete this file.\n\nThis action cannot be undone.');">
-                        <button type="submit">
-                            <img src="/icons/trash.svg" alt="Delete">
-                        </button>
-                    </form>
-                </div>
+                        <div class="meta-row">
+                            <span class="meta-label">File size</span>
+                            <span class="meta-value">
+                                <%= result.sizePretty %>
+                            </span>
+                        </div>
 
+                        <div class="meta-row">
+                            <span class="meta-label">Uploaded</span>
+                            <span class="meta-value">
+                                <%= result.createdAtPretty %>
+                            </span>
+                        </div>
+
+                        <form class="meta-actions" action="/files/<%= result.id %>/delete" method="post"
+                            onsubmit="return confirm('⚠️ This will permanently delete this file.\n\nThis action cannot be undone.');">
+                            <button class="btn btn-danger btn-icon" type="submit">
+                                <img src="/icons/trash.svg" alt="Delete">
+                                <span>Delete</span>
+                            </button>
+                        </form>
+                    </aside>
+                </section>
                 <% } else { %>
                     <h1>File not found...</h1>
                     <% } %>
-
         </main>
 </body>

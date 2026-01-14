@@ -8,8 +8,7 @@
 <body>
     <%- include("partials/header") %>
 
-        <main>
-
+        <main class="viewer-main">
             <nav class="breadcrumbs">
                 <% if (breadcrumbs && breadcrumbs.length) { %>
                     <% breadcrumbs.forEach((b)=> { %>
@@ -35,61 +34,63 @@
             </nav>
 
             <% if (file) { %>
-                <div class="file-preview">
-
-                    <% if (file.mimeType && file.mimeType.startsWith("image/")) { %>
-                        <img src="<%= file.previewUrl %>" alt="<%= file.originalName %>"
-                            style="max-width: 100%; max-height: 500px;">
-
-                        <% } else if (file.mimeType && file.mimeType.startsWith("video/")) { %>
-                            <video src="<%= file.previewUrl %>" controls style="max-width: 100%; max-height: 500px;">
-                                Your browser does not support video playback.
-                            </video>
-
-                            <% } else if (file.mimeType && file.mimeType.startsWith("audio/")) { %>
-                                <audio src="<%= file.previewUrl %>" controls>
-                                    Your browser does not support audio playback.
-                                </audio>
-
-                                <% } else if (file.mimeType==="application/pdf" ) { %>
-                                    <object data="<%= file.previewUrl %>" type="application/pdf"
-                                        style="width: 100%; height: 600px;">
-                                        <p>
-                                            PDF preview not available.
-                                            <a href="<%= file.previewUrl %>" target="_blank" rel="noopener">Open PDF</a>
-                                        </p>
-                                    </object>
-
-                                    <% } else { %>
-                                        <div class="no-preview">
-                                            <p>No preview available for this file type.</p>
-                                            <a href="<%= file.previewUrl %>" target="_blank" rel="noopener">
-                                                Open file
-                                            </a>
-                                        </div>
-                                        <% } %>
-
-                </div>
-
-                <div class="file-meta">
-                    <a href="<%= file.previewUrl %>" download>Download</a>
-                    <div>
-                        <strong>
-                            <%= file.originalName %>
-                        </strong>
-                    </div>
-                    <div>
-                        File size: <%= file.sizeBytes %> bytes
+                <section class="viewer-layout">
+                    <div class="file-preview">
+                        <% if (file.mimeType && file.mimeType.startsWith("image/")) { %>
+                            <img class="preview-media" src="<%= file.previewUrl %>" alt="<%= file.originalName %>">
+                            <% } else if (file.mimeType && file.mimeType.startsWith("video/")) { %>
+                                <video class="preview-media" src="<%= file.previewUrl %>" controls>
+                                    Your browser does not support video playback.
+                                </video>
+                                <% } else if (file.mimeType && file.mimeType.startsWith("audio/")) { %>
+                                    <audio class="preview-audio" src="<%= file.previewUrl %>" controls>
+                                        Your browser does not support audio playback.
+                                    </audio>
+                                    <% } else if ( file.mimeType==="application/pdf" || (file.previewUrl &&
+                                        file.previewUrl.toLowerCase().includes(".pdf")) ) { %>
+                                        <object class="preview-pdf" data="<%= file.previewUrl %>"
+                                            type="application/pdf">
+                                            <p>
+                                                PDF preview not available.
+                                                <a href="<%= file.previewUrl %>" target="_blank" rel="noopener">Open
+                                                    PDF</a>
+                                            </p>
+                                        </object>
+                                        <% } else { %>
+                                            <div class="no-preview">
+                                                <p>No preview available for this file type.</p>
+                                                <a href="<%= file.previewUrl %>" target="_blank" rel="noopener">Open
+                                                    file</a>
+                                            </div>
+                                            <% } %>
                     </div>
 
-                    <div>
-                        Uploaded: <%= file.createdAt %>
-                    </div>
-                </div>
+                    <aside class="file-meta">
+                        <a class="btn btn-primary" href="<%= file.previewUrl %>" download>Download</a>
 
+                        <div class="meta-block">
+                            <div class="meta-title">
+                                <%= file.originalName %>
+                            </div>
+                        </div>
+
+                        <div class="meta-row">
+                            <span class="meta-label">File size</span>
+                            <span class="meta-value">
+                                <%= file.sizePretty %>
+                            </span>
+                        </div>
+
+                        <div class="meta-row">
+                            <span class="meta-label">Uploaded</span>
+                            <span class="meta-value">
+                                <%= file.createdAtPretty %>
+                            </span>
+                        </div>
+                    </aside>
+                </section>
                 <% } else { %>
                     <h1>File not found...</h1>
                     <% } %>
-
         </main>
 </body>
