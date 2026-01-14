@@ -618,3 +618,144 @@ header {
     color: var(--text-primary);
     font-size: 0.9rem;
 }
+
+.viewer-main {
+    margin: 2rem auto;
+    width: min(75rem, calc(100% - 2rem));
+}
+
+.viewer-layout {
+    display: grid;
+    grid-template-columns: 1fr 18rem;
+    gap: 1.25rem;
+    align-items: start;
+    margin-top: 1rem;
+}
+
+.file-preview {
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 18rem;
+}
+
+.file-preview>* {
+    max-width: 100%;
+}
+
+.preview-media {
+    width: 100%;
+    max-height: 520px;
+    object-fit: contain;
+    border-radius: var(--radius-md);
+    display: block;
+}
+
+.preview-audio {
+    width: min(520px, 100%);
+}
+
+.preview-pdf {
+    width: 100%;
+    height: 620px;
+    border: none;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    display: block;
+}
+
+.no-preview {
+    width: 100%;
+    display: grid;
+    gap: 0.5rem;
+    justify-items: center;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.file-meta {
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    padding: 1rem;
+    display: grid;
+    gap: 0.75rem;
+
+    position: sticky;
+    top: 6.5rem;
+}
+
+.meta-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    word-break: break-word;
+}
+
+.meta-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.9rem;
+}
+
+.meta-label {
+    color: var(--text-muted);
+}
+
+.meta-value {
+    color: var(--text-primary);
+    text-align: right;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    height: 2.5rem;
+    padding: 0 1rem;
+
+    border-radius: var(--radius-md);
+    border: 2px solid transparent;
+    font-weight: 600;
+    cursor: pointer;
+
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent-hover);
+    color: var(--text-primary);
+    border-color: var(--accent-primary);
+}
+
+.btn-danger {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+    width: 100%;
+}
+
+.btn-danger:hover {
+    background: rgba(251, 162, 162, 0.5);
+    border-color: var(--danger-hover);
+    color: var(--text-primary);
+    border-color: red;
+}
+
+.btn-icon img {
+    width: 18px;
+    height: 18px;
+}
