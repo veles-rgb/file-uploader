@@ -32,6 +32,35 @@ async function renderFiles(req, res, next) {
     }
 }
 
+function formatBytes(bytes) {
+    if (!Number.isFinite(bytes)) return "—";
+    const units = ["B", "KB", "MB", "GB", "TB"];
+    let size = bytes;
+    let i = 0;
+    while (size >= 1024 && i < units.length - 1) {
+        size /= 1024;
+        i++;
+    }
+    const decimals = i === 0 ? 0 : i === 1 ? 0 : 1;
+    return `${size.toFixed(decimals)} ${units[i]}`;
+}
+
+function formatDate(dt) {
+    if (!dt) return "—";
+    try {
+        return new Intl.DateTimeFormat("en-CA", {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+        }).format(new Date(dt));
+    } catch {
+        return String(dt);
+    }
+}
+
+
 async function renderFileById(req, res, next) {
     if (!req.user) return res.redirect('/login');
 
@@ -58,6 +87,8 @@ async function renderFileById(req, res, next) {
         const result = {
             ...fileFromDb,
             previewUrl: toPreviewUrl(fileFromDb.storagePath),
+            sizePretty: formatBytes(fileFromDb.sizeBytes),
+            createdAtPretty: formatDate(fileFromDb.createdAt),
         };
 
         const breadcrumbs = result.folderId
