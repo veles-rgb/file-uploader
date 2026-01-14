@@ -15,8 +15,9 @@
                         <input type="hidden" name="name" id="new-folder-name" />
                         <input type="hidden" name="parentId" value="<%= currentFolder ? currentFolder.id : '' %>" />
                     </form>
-                    <button onclick="window.location.href='files/upload'">Upload File</button>
+                    <button onclick="window.location.href='/files/upload'">Upload File</button>
                 </div>
+
                 <div class="file-folder-browser">
                     <% if (foldersFromDb && foldersFromDb.length> 0) { %>
                         <div class="folders-display">
@@ -54,6 +55,7 @@
                         <% } else { %>
                             <p>No Folders</p>
                             <% } %>
+
                                 <% if (results && results.length> 0) { %>
                                     <div class="files-display">
                                         <% results.forEach(result=> { %>
@@ -91,11 +93,14 @@
                                                 <% } %>
                 </div>
         </main>
+
         <script>
             (function () {
                 const btn = document.getElementById("new-folder-btn");
                 const form = document.getElementById("new-folder-form");
                 const nameInput = document.getElementById("new-folder-name");
+
+                if (!btn || !form || !nameInput) return;
 
                 btn.addEventListener("click", () => {
                     const name = window.prompt("Folder name:");
@@ -109,32 +114,54 @@
                 });
             })();
         </script>
+
         <script>
-            document.addEventListener("click", (e) => {
-                const clickedDropdown = e.target.closest(".folder-dropdown");
-                const clickedToggle = e.target.closest(".dropdown-toggle");
-                const clickedMenu = e.target.closest(".dropdown-content");
-
-                // Clicked completely outside any dropdown => close all
-                if (!clickedDropdown) {
-                    document.querySelectorAll(".folder-dropdown.open")
-                        .forEach(d => d.classList.remove("open"));
-                    return;
+            // Dropdown open/close + lift card above grid siblings
+            (function () {
+                function closeAll(exceptDropdown) {
+                    document.querySelectorAll(".folder-dropdown.open").forEach((d) => {
+                        if (exceptDropdown && d === exceptDropdown) return;
+                        d.classList.remove("open");
+                        const card = d.closest(".folder-item");
+                        if (card) card.classList.remove("dropdown-open");
+                    });
                 }
 
-                // Clicked inside the menu (input, buttons, form, etc.) => keep it open
-                if (clickedMenu && !clickedToggle) {
-                    return;
-                }
+                document.addEventListener("click", (e) => {
+                    const toggle = e.target.closest(".dropdown-toggle");
+                    const dropdown = e.target.closest(".folder-dropdown");
+                    const menu = e.target.closest(".dropdown-content");
 
-                // Clicked the toggle icon => toggle this dropdown, close others
-                document.querySelectorAll(".folder-dropdown.open")
-                    .forEach(d => { if (d !== clickedDropdown) d.classList.remove("open"); });
+                    // Clicked outside ANY dropdown => close all
+                    if (!dropdown) {
+                        closeAll();
+                        return;
+                    }
 
-                if (clickedToggle) {
-                    clickedDropdown.classList.toggle("open");
-                }
-            });
+                    // Click inside menu (inputs/buttons/forms) => keep it open
+                    if (menu && !toggle) {
+                        return;
+                    }
+
+                    // Clicked toggle => toggle this dropdown, close others
+                    if (toggle) {
+                        closeAll(dropdown);
+
+                        dropdown.classList.toggle("open");
+                        const card = dropdown.closest(".folder-item");
+                        if (card) {
+                            // Lift card above neighbors when open
+                            if (dropdown.classList.contains("open")) card.classList.add("dropdown-open");
+                            else card.classList.remove("dropdown-open");
+                        }
+                    }
+                });
+
+                // ESC closes all
+                document.addEventListener("keydown", (e) => {
+                    if (e.key === "Escape") closeAll();
+                });
+            })();
         </script>
 
 </body>

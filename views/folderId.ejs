@@ -64,6 +64,7 @@
                         </div>
                         <% } %>
                 </div>
+
                 <div class="file-folder-browser">
                     <% if (children && children.length> 0) { %>
                         <div class="folders-display">
@@ -139,11 +140,14 @@
                                                 <% } %>
                 </div>
         </main>
+
         <script>
             (function () {
                 const btn = document.getElementById("new-folder-btn");
                 const form = document.getElementById("new-folder-form");
                 const nameInput = document.getElementById("new-folder-name");
+
+                if (!btn || !form || !nameInput) return;
 
                 btn.addEventListener("click", () => {
                     const name = window.prompt("Folder name:");
@@ -158,30 +162,51 @@
                 });
             })();
         </script>
+
         <script>
-            document.addEventListener("click", (e) => {
-                const clickedDropdown = e.target.closest(".folder-dropdown");
-                const clickedToggle = e.target.closest(".dropdown-toggle");
-                const clickedMenu = e.target.closest(".dropdown-content");
-
-                if (!clickedDropdown) {
-                    document.querySelectorAll(".folder-dropdown.open")
-                        .forEach(d => d.classList.remove("open"));
-                    return;
+            // Dropdown open/close + lift card above grid siblings
+            (function () {
+                function closeAll(exceptDropdown) {
+                    document.querySelectorAll(".folder-dropdown.open").forEach((d) => {
+                        if (exceptDropdown && d === exceptDropdown) return;
+                        d.classList.remove("open");
+                        const card = d.closest(".folder-item");
+                        if (card) card.classList.remove("dropdown-open");
+                    });
                 }
 
-                if (clickedMenu && !clickedToggle) {
-                    return;
-                }
+                document.addEventListener("click", (e) => {
+                    const toggle = e.target.closest(".dropdown-toggle");
+                    const dropdown = e.target.closest(".folder-dropdown");
+                    const menu = e.target.closest(".dropdown-content");
 
-                document.querySelectorAll(".folder-dropdown.open")
-                    .forEach(d => { if (d !== clickedDropdown) d.classList.remove("open"); });
+                    if (!dropdown) {
+                        closeAll();
+                        return;
+                    }
 
-                if (clickedToggle) {
-                    clickedDropdown.classList.toggle("open");
-                }
-            });
+                    if (menu && !toggle) {
+                        return;
+                    }
+
+                    if (toggle) {
+                        closeAll(dropdown);
+
+                        dropdown.classList.toggle("open");
+                        const card = dropdown.closest(".folder-item");
+                        if (card) {
+                            if (dropdown.classList.contains("open")) card.classList.add("dropdown-open");
+                            else card.classList.remove("dropdown-open");
+                        }
+                    }
+                });
+
+                document.addEventListener("keydown", (e) => {
+                    if (e.key === "Escape") closeAll();
+                });
+            })();
         </script>
+
         <script>
             (function () {
                 const btn = document.querySelector(".copy-btn");
@@ -191,6 +216,7 @@
 
                 btn.addEventListener("click", async () => {
                     const text = btn.dataset.copy || document.getElementById("shareLink")?.value || "";
+                    if (!text) return;
 
                     try {
                         await navigator.clipboard.writeText(text);
