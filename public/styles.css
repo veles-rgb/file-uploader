@@ -796,3 +796,51 @@ header {
 }
 
 /* Error page */
+.error-main {
+    min-height: calc(100vh - 76px);
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+}
+
+.error-card {
+    background: var(--bg-surface);
+    border: 2px solid var(--accent-primary);
+    border-radius: var(--radius-md);
+    padding: 2.5rem 3rem;
+    max-width: 32rem;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.error-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--accent-primary);
+}
+
+.error-message {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.error-link {
+    display: inline-block;
+    padding: 0.7rem 1.4rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--accent-primary);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.error-link:hover {
+    background-color: var(--accent-hover);
+    color: var(--text-primary);
+    border: 2px solid var(--accent-primary);
+    transform: translateY(-1px);
+}
