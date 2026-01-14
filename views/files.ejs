@@ -7,98 +7,89 @@
 
 <body>
     <%- include("partials/header") %>
-        <main>
+        <main class="browser-main">
             <% if (currentUser) { %>
-                <button type="button" id="new-folder-btn">New Folder</button>
-                <form id="new-folder-form" action="/folders/create" method="POST" style="display:none;">
-                    <input type="hidden" name="name" id="new-folder-name" />
-                    <input type="hidden" name="parentId" value="<%= currentFolder ? currentFolder.id : '' %>" />
-                </form>
-                <button onclick="window.location.href='files/upload'">Upload File</button>
-                <% if (foldersFromDb && foldersFromDb.length> 0) { %>
-                    <div>
-                        <% foldersFromDb.forEach(folder=> { %>
-                            <div class="folder-item">
-                                <a href="/folders/<%= folder.id %>">
-                                    <img src="/icons/folder.svg" alt="">
-                                    <p>
-                                        <%= folder.name %>
-                                    </p>
-                                </a>
-                                <div class="folder-dropdown">
-                                    <img src="/icons/edit.svg" class="dropdown-toggle">
+                <div class="browser-button-container">
+                    <button type="button" id="new-folder-btn">New Folder</button>
+                    <form id="new-folder-form" action="/folders/create" method="POST" style="display:none;">
+                        <input type="hidden" name="name" id="new-folder-name" />
+                        <input type="hidden" name="parentId" value="<%= currentFolder ? currentFolder.id : '' %>" />
+                    </form>
+                    <button onclick="window.location.href='files/upload'">Upload File</button>
+                </div>
+                <div class="file-folder-browser">
+                    <% if (foldersFromDb && foldersFromDb.length> 0) { %>
+                        <div class="folders-display">
+                            <% foldersFromDb.forEach(folder=> { %>
+                                <div class="folder-item">
+                                    <a href="/folders/<%= folder.id %>" class="folder-link">
+                                        <img src="/icons/folder.svg" alt="">
+                                        <p>
+                                            <%= folder.name %>
+                                        </p>
+                                    </a>
 
-                                    <div class="dropdown-content">
-                                        <form action="/folders/<%= folder.id %>/rename" method="POST">
-                                            <input type="text" name="name" value="<%= folder.name %>" required
-                                                minlength="1" maxlength="120" />
+                                    <div class="folder-dropdown">
+                                        <img src="/icons/edit.svg" class="dropdown-toggle">
 
-                                            <button type="submit">
-                                                Rename
+                                        <div class="dropdown-content">
+                                            <form action="/folders/<%= folder.id %>/rename" method="POST">
+                                                <input type="text" name="name" value="<%= folder.name %>" required />
+                                                <button type="submit">Rename</button>
+                                            </form>
+
+                                            <button onclick="window.location.href='/share/folder/<%= folder.id %>'">
+                                                Share
                                             </button>
-                                        </form>
 
-                                        <button
-                                            onclick="window.location.href='/share/folder/<%= folder.id %>'">Share</button>
-
-                                        <form action="/folders/<%= folder.id %>/delete" method="POST" onsubmit="return confirm(
-        '⚠️ This will permanently delete this folder AND everything inside it.\n\nThis action cannot be undone.'
-    );">
-                                            <button type="submit" class="danger">
-                                                Delete
-                                            </button>
-                                        </form>
+                                            <form action="/folders/<%= folder.id %>/delete" method="POST"
+                                                onsubmit="return confirm('⚠️ This will permanently delete this folder AND everything inside it.\n\nThis action cannot be undone.')">
+                                                <button type="submit" class="danger">Delete</button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
+                                <% }) %>
+                        </div>
+                        <% } else { %>
+                            <p>No Folders</p>
+                            <% } %>
+                                <% if (results && results.length> 0) { %>
+                                    <div class="files-display">
+                                        <% results.forEach(result=> { %>
+                                            <div class="file-item">
+                                                <a href="/files/<%= result.id %>" class="file-link">
+                                                    <div class="file-card">
+                                                        <% if (result.mimeType.startsWith("image/")) { %>
+                                                            <img src="<%= result.previewUrl %>"
+                                                                alt="<%= result.originalName %>" width="64">
+                                                            <% } else if (result.mimeType.startsWith("video/")) { %>
+                                                                <img src="/icons/video.svg" alt="Video" width="64">
+                                                                <% } else if (result.mimeType.startsWith("audio/")) { %>
+                                                                    <img src="/icons/music.svg" alt="Audio" width="64">
+                                                                    <% } else if (result.mimeType==="application/pdf" )
+                                                                        { %>
+                                                                        <img src="/icons/file.svg" alt="PDF" width="64">
+                                                                        <% } else { %>
+                                                                            <img src="/icons/file.svg" alt="File"
+                                                                                width="64">
+                                                                            <% } %>
 
-                            </div>
-                            <% }) %>
-                    </div>
-                    <% } else { %>
-                        <p>No Folders</p>
-                        <% } %>
-                            <% if (results && results.length> 0) { %>
-                                <div>
-                                    <% results.forEach(result=> { %>
-                                        <div>
-                                            <a href="/files/<%= result.id %>"
-                                                style="text-decoration: none; color: inherit;">
-                                                <div class="file-card">
-
-                                                    <% if (result.mimeType.startsWith("image/")) { %>
-                                                        <img src="<%= result.previewUrl %>"
-                                                            alt="<%= result.originalName %>" width="64">
-
-                                                        <% } else if (result.mimeType.startsWith("video/")) { %>
-                                                            <img src="/icons/video.svg" width="64">
-
-                                                            <% } else if (result.mimeType.startsWith("audio/")) { %>
-                                                                <img src="/icons/music.svg" alt="Audio" width="64">
-
-                                                                <% } else if (result.mimeType==="application/pdf" ) { %>
-                                                                    <img src="/icons/file.svg" alt="PDF" width="64">
-
-                                                                    <% } else { %>
-                                                                        <img src="/icons/file.svg" alt="File"
-                                                                            width="64">
-                                                                        <% } %>
-
-                                                                            <div class="file-name">
-                                                                                <%= result.originalName %>
-                                                                            </div>
-
-                                                </div>
-                                            </a>
-                                        </div>
-
-                                        <% }) %>
-                                </div>
-                                <% } else { %>
-                                    <p>No files.</p>
-                                    <% } %>
-                                        <% } else { %>
-                                            <h1>Unauthorized access</h1>
-                                            <% } %>
+                                                                                <div class="file-name">
+                                                                                    <%= result.originalName %>
+                                                                                </div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                            <% }) %>
+                                    </div>
+                                    <% } else { %>
+                                        <p>No files.</p>
+                                        <% } %>
+                                            <% } else { %>
+                                                <h1>Unauthorized access</h1>
+                                                <% } %>
+                </div>
         </main>
         <script>
             (function () {

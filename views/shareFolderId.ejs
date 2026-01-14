@@ -8,8 +8,7 @@
 <body>
     <%- include("partials/header") %>
 
-        <main>
-
+        <main class="browser-main">
             <nav class="breadcrumbs">
                 <% if (breadcrumbs && breadcrumbs.length) { %>
                     <% breadcrumbs.forEach((b)=> { %>
@@ -26,49 +25,46 @@
                                     <% }) %>
                                         <% } %>
             </nav>
-
-            <% if (childFolders && childFolders.length> 0) { %>
-                <% childFolders.forEach((child)=> { %>
-                    <div class="folder-item">
-                        <a href="/share/<%= token %>/folders/<%= child.id %>">
-                            <img src="/icons/folder.svg" alt="">
-                            <p>
-                                <%= child.name %>
-                            </p>
-                        </a>
+            <div class="file-folder-browser">
+                <% if (childFolders && childFolders.length> 0) { %>
+                    <div class="folders-display">
+                        <% childFolders.forEach((child)=> { %>
+                            <div class="folder-item">
+                                <a href="/share/<%= token %>/folders/<%= child.id %>" class="folder-link">
+                                    <img src="/icons/folder.svg" alt="">
+                                    <p>
+                                        <%= child.name %>
+                                    </p>
+                                </a>
+                            </div>
+                            <% }) %>
                     </div>
-                    <% }) %>
-                        <% } else { %>
-                            <p>No folders.</p>
-                            <% } %>
+                    <% } else { %>
+                        <p>No folders.</p>
+                        <% } %>
 
-                                <% const list=(typeof files !=="undefined" && files) ? files : (typeof childFiles
-                                    !=="undefined" ? childFiles : []); %>
+                            <% const list=(typeof files !=="undefined" && files) ? files : (typeof childFiles
+                                !=="undefined" ? childFiles : []); %>
 
-                                    <% if (list && list.length> 0) { %>
-                                        <% list.forEach((child)=> { %>
-                                            <div>
-                                                <a href="/share/<%= token %>/files/<%= child.id %>"
-                                                    style="text-decoration: none; color: inherit;">
+                                <% if (list && list.length> 0) { %>
+                                    <div class="files-display">
+                                        <% list.forEach(child=> { %>
+                                            <div class="file-item">
+                                                <a href="/share/<%= token %>/files/<%= child.id %>" class="file-link">
                                                     <div class="file-card">
-
                                                         <% if (child.mimeType && child.mimeType.startsWith("image/")) {
                                                             %>
                                                             <img src="<%= child.previewUrl %>"
                                                                 alt="<%= child.originalName %>" width="64">
-
                                                             <% } else if (child.mimeType &&
                                                                 child.mimeType.startsWith("video/")) { %>
                                                                 <img src="/icons/video.svg" alt="Video" width="64">
-
                                                                 <% } else if (child.mimeType &&
                                                                     child.mimeType.startsWith("audio/")) { %>
                                                                     <img src="/icons/music.svg" alt="Audio" width="64">
-
                                                                     <% } else if (child.mimeType==="application/pdf" ) {
                                                                         %>
                                                                         <img src="/icons/file.svg" alt="PDF" width="64">
-
                                                                         <% } else { %>
                                                                             <img src="/icons/file.svg" alt="File"
                                                                                 width="64">
@@ -77,14 +73,14 @@
                                                                                 <div class="file-name">
                                                                                     <%= child.originalName %>
                                                                                 </div>
-
                                                     </div>
                                                 </a>
                                             </div>
                                             <% }) %>
-                                                <% } else { %>
-                                                    <p>No Files.</p>
-                                                    <% } %>
-
+                                    </div>
+                                    <% } else { %>
+                                        <p>No Files.</p>
+                                        <% } %>
+            </div>
         </main>
 </body>
