@@ -7,9 +7,9 @@
 
 <body>
     <%- include("partials/header") %>
-        <main>
-            <p>Do you want to share "<%= folder.name %>" to the public?</p>
+        <main class="form-main">
             <form action="/share/folder/<%= folderId %>" method="post">
+                <h3>Share "<%= folder.name %>" to the public</h3>
                 <label for="expires">Expire At</label>
                 <input type="datetime-local" name="expires" id="expires">
                 <button type="submit">Generate Link</button>
