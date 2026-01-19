@@ -875,3 +875,25 @@ header {
         transform: rotate(360deg);
     }
 }
+
+/* Footer */
+
+footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+footer a {
+    color: var(--accent-primary);
+    text-decoration: none;
+    padding: 0.3rem;
+    border: 1px solid var(--accent-primary);
+    border-radius: var(--radius-sm);
+}
+
+footer a:hover {
+    background-color: var(--accent-primary);
+    color: var(--text-inverse);
+    text-decoration: underline;
+}
