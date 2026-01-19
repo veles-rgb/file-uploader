@@ -20,9 +20,15 @@
                     </p>
                     <% } %>
 
-                        <a href="/files" class="error-link">
-                            Go back to files
-                        </a>
+                        <% if (currentUser) { %>
+                            <a href="/files" class="error-link">
+                                Go back to files
+                            </a>
+                            <% } else { %>
+                                <a href="/" class="error-link">
+                                    Home
+                                </a>
+                                <% } %>
             </div>
         </main>
 </body>

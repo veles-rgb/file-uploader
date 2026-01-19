@@ -103,6 +103,21 @@ const assetsPath = path.join(__dirname, "public");
     app.use('/folders', foldersRouter);
     app.use('/share', shareRouter);
 
+    app.use((req, res, next) => {
+        const error = new Error(`Cannot GET ${req.originalUrl}`);
+        error.status = 404;
+        next(error);
+    });
+
+    app.use((err, req, res, next) => {
+        res.status(err.status || 500);
+        res.render("error", {
+            title: "Page does not exist",
+            message: "The page you're looking for does not exist."
+        });
+    });
+
+
 
     const PORT = process.env.PORT || 3001;
     app.listen(PORT, () => {
