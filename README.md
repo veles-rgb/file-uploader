@@ -103,6 +103,94 @@ Created for [The Odin Project](https://www.theodinproject.com/lessons/nodejs-fil
 
 ---
 
+## Database Schema
+
+The project uses **[PostgreSQL](https://www.postgresql.org/)** with **[Prisma ORM](https://www.prisma.io/)**.
+
+### User
+
+Represents an authenticated account.
+
+- `id` – unique user ID
+- `email` – login email (unique)
+- `username` – display name (unique)
+- `hashedPassword` – securely stored password hash
+- `createdAt` – account creation timestamp
+
+**Relations**
+
+- Has many **Folders**
+- Has many **Files**
+- Has many **Shares**
+
+### Folder
+
+Represents a directory in the file system.  
+Folders can be nested infinitely.
+
+- `id` – unique folder ID
+- `name` – folder name
+- `ownerId` – owner (User)
+- `parentId` – parent folder (nullable)
+- `createdAt` – creation timestamp
+
+**Relations**
+
+- Belongs to a **User**
+- May have a parent **Folder**
+- May have many child **Folders**
+- Contains many **Files**
+- Can be shared via **Share**
+
+**Constraints**
+
+- Folder names are unique per parent folder per user
+
+### File
+
+Represents an uploaded file.
+
+- `id` – unique file ID
+- `ownerId` – owner (User)
+- `folderId` – parent folder (nullable)
+- `originalName` – original filename
+- `storagePath` – Cloudinary URL or storage path
+- `mimeType` – file type
+- `sizeBytes` – file size
+- `cloudinaryPublicId` – Cloudinary identifier (if uploaded)
+- `createdAt` – upload timestamp
+
+**Relations**
+
+- Belongs to a **User**
+- Optionally belongs to a **Folder**
+
+### Share
+
+Represents a public shareable link for a folder.
+
+- `id` – unique share ID
+- `token` – public share token
+- `ownerId` – owner (User)
+- `folderId` – shared folder
+- `createdAt` – creation timestamp
+- `expiresAt` – optional expiration date
+
+**Behavior**
+
+- Only folders (not root) can be shared
+- Public users can browse folders and files inside the shared folder
+- Share links can expire or be revoked
+
+### Session
+
+Used for authentication sessions.
+
+- `id` – session ID
+- `sid` – unique session identifier
+- `data` – session data
+- `expiresAt` – expiration timestamp
+
 ## Environment Variables
 
 The following environment variables are required:
