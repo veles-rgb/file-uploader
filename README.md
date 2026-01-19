@@ -12,12 +12,13 @@ Created for [The Odin Project](https://www.theodinproject.com/lessons/nodejs-fil
 
 ## Features
 
-- User authentication (login required)
+- Session based user authentication (login required)
+- User accounts (login / register)
 - Folder & nested folder structure
 - File upload with size limits (10MB)
 - Image, video, audio, and PDF previews
 - Downloadable files
-- Delete files and folders (recursive)
+- CRUD folders / delete files (recursive)
 - Public share links for folders (read-only)
 - Share expiration support
 - Breadcrumb navigation
